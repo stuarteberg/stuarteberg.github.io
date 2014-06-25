@@ -49,6 +49,7 @@ foo.c   foo.h   foo.so
 <p>Great.  Now let's try to use it:</p>
 
 <pre><code>$ cat &gt; main.c
+#include "foo.h"
 int main() { greet(); } 
 $ gcc -o main main.c foo.so
 $ ls
