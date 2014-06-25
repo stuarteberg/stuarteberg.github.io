@@ -1,74 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Stuarteberg.github.io : " />
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <title>Stuarteberg.github.io</title>
+  <meta name="description" content="">
 
-    <title>Stuarteberg.github.io</title>
-  </head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <body>
+</head>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/stuarteberg">View on GitHub</a>
+<body>
 
-          <h1 id="project_title">Stuarteberg.github.io</h1>
-          <h2 id="project_tagline"></h2>
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Stuarteberg.github.io</h1>
+    </header>
+    <div id="container">
+      <p class="tagline"></p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/stuarteberg" class="code">View Stuarteberg.github.io on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>
+<a name="quick-explainer-how-can-you-help-a-binary-file-find-its-dependencies--let-me-count-the-ways" class="anchor" href="#quick-explainer-how-can-you-help-a-binary-file-find-its-dependencies--let-me-count-the-ways"><span class="octicon octicon-link"></span></a>Quick Explainer: How can you help a binary file find its dependencies?  (Let me count the ways...)</h1>
 
-        </header>
-    </div>
+<p>(This little tutorial is written for Linux, but the Mac OS X version is basically the same.  Use <code>otool -L</code> instead of <code>ldd</code>, and replace <code>-soname</code> with <code>-install_name</code>.)</p>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<p>Before we start talking about shared objects, let's make one:</p>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<pre><code>$ mkdir /tmp/example
+$ cd /tmp/example
+$ cat &gt; foo.c
+#include &lt;stdio.h&gt;
+void greet() { printf("Hello from foo.c\n"); }
+$ cat &gt; foo.h
+void greet();
+$ gcc -shared -fPIC -o foo.so foo.c
+$ ls
+foo.c   foo.h   foo.so
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Great.  Now let's try to use it:</p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<pre><code>$ cat &gt; main.c
+int main() { greet(); } 
+$ gcc -o main main.c foo.so
+$ ls
+foo.c   foo.h   foo.so main   main.c
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Looks good so far... Does it work?</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<pre><code>$ ./main
+Hello from foo.c
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Sure does.  We can use <code>ldd</code> to see that our executable does, in fact, depend on <code>foo.so</code>:</p>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<pre><code>$ ldd main
+    linux-vdso.so.1 =&gt;  (0x00007fff06193000)
+    foo.so (0x00007fee81382000)
+    libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007fee80fbc000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007fee81586000)
+</code></pre>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Is our executable ready for general use?  For example, what happens if we switch directories and try to run it again?</p>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<pre><code>$ cd /
+$ /tmp/example/main 
+/tmp/example/main: error while loading shared libraries: foo.so: cannot open shared object file: No such file or directory
+</code></pre>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
+<p>Ouch.  What went wrong?  Before we switch directories again, let's see what <code>ldd</code> can tell us:</p>
+
+<pre><code>$ ldd /tmp/example/main
+    linux-vdso.so.1 =&gt;  (0x00007fffc17ff000)
+    foo.so =&gt; not found
+    libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007faaaaba0000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007faaaaf67000)
+</code></pre>
+
+<p>Hmm... the loader knows that our executable depends on something called <code>foo.so</code>, but it doesn't know where to find it.  How can we help it?</p>
+
+<h2>
+<a name="option-1-ld_library_path" class="anchor" href="#option-1-ld_library_path"><span class="octicon octicon-link"></span></a>Option 1: LD_LIBRARY_PATH</h2>
+
+<p>There's a special environment variable called <code>LD_LIBRARY_PATH</code> that can be used to tell the loader where to look for <code>.so</code> files.  Let's give it a try:</p>
+
+<pre><code>$ export LD_LIBRARY_PATH=/tmp/example
+$ /tmp/example/main
+Hello from foo.c
+</code></pre>
+
+<p>Okay, that worked, but it may not be convenient to require our users to have a special environment setup.</p>
+
+<h2>
+<a name="option-2-hard-code-the-path-in-the-fooso-soname" class="anchor" href="#option-2-hard-code-the-path-in-the-fooso-soname"><span class="octicon octicon-link"></span></a>Option 2: Hard-code the path in the foo.so soname.</h2>
+
+<p>Let's back up a bit.  When we built <code>foo.so</code>, we didn't give any though to the loader.  Let's rebuild it with a custom <code>soname</code> setting:</p>
+
+<pre><code>$ gcc -shared -fPIC -o foo.so -Wl,-soname,/tmp/example/foo.so foo.c
+</code></pre>
+
+<p>After rebuilding our main executable, what does ldd say?</p>
+
+<pre><code>$ gcc -o main main.c foo.so
+$ ldd main
+    linux-vdso.so.1 =&gt;  (0x00007fff8d987000)
+    /tmp/example/foo.so (0x00007f6b85c97000)
+    libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6b858d2000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007f6b85e9b000)
+</code></pre>
+
+<p>Now the path to <code>foo.so</code> is hard-coded into our executable.  We should't need LD_LIBRARY_PATH any more, right?</p>
+
+<pre><code>$ cd /
+$ export LD_LIBRARY_PATH=
+$ /tmp/example/main
+Hello from foo.c
+</code></pre>
+
+<p>Looks good!  But wait, this means that we can't ever move <code>foo.so</code> out of <code>/tmp/example</code>.  In fact, if foo.so is moved, our <code>main</code> executable won't run, no matter what changes we make to <code>LD_LIBRARY_PATH</code>.  If you can count on your shared object being installed to a standard location, then maybe that's okay.  If not, do you have any other options?</p>
+
+<h2>
+<a name="option-3-hard-code-the-library-search-directory-in-mains-rpath" class="anchor" href="#option-3-hard-code-the-library-search-directory-in-mains-rpath"><span class="octicon octicon-link"></span></a>Option 3: Hard-code the library search directory in main's rpath</h2>
+
+<p>This time, we'll leave <code>foo.so</code>'s <code>soname</code> alone.  Instead, we'll tell <code>main</code> where to look for its dependencies:</p>
+
+<pre><code>$ gcc -o main main.c foo.so
+$ gcc -o main -Wl,-rpath,/tmp/example main.c foo.so
+</code></pre>
+
+<p>We can verify that our executable has our custom <code>rpath</code> using the <code>chrpath</code> tool:</p>
+
+<pre><code>$ chrpath main
+main: RPATH=/tmp/example
+</code></pre>
+
+<p>So, can we execute our program even if we switch to some other directory?</p>
+
+<pre><code>$ cd /
+$ /tmp/example/main
+Hello from foo.c
+</code></pre>
+
+<p>Nice.  But... This solution seems just as fragile as the <code>soname</code> change above (Option 2).  Are there any advantages to using <code>rpath</code> to locate our shared object?  Yes!  If we plan to distribute our main executable alongside our shared object as part of a larger package, we can use a relative path.  The special variable <code>$ORIGIN</code> is recognized inside the <code>rpath</code> to enable this feature:</p>
+
+<pre><code>$ gcc -o main -Wl,-rpath,\$ORIGIN/. main.c foo.so
+$ chrpath main
+main: RPATH=$ORIGIN/.
+</code></pre>
+
+<p>Note that there are quoting issues to worry about here.  I used a <code>\</code> to prevent the shell from misinterpreting <code>$ORIGIN</code> as an environment variable.</p>
+
+<p>More than one search path can be listed in an <code>rpath</code>.  One way to include multiple paths is to simply pass the <code>-rpath</code> setting to the linker more than once:</p>
+
+<pre><code>$ gcc -o main -Wl,-rpath,\$ORIGIN/. -Wl,-rpath,\$ORIGIN/../../lib main.c foo.so
+$ chrpath main
+main: RPATH=$ORIGIN/.:$ORIGIN/../../lib
+</code></pre>
+
+<p>This way, if you have a whole directory tree with shared objects and executable programs in subdirectories, you can use relative <code>rpath</code>s to help locate the shared objects.  Furthermore, if you copy the whole directory tree and give it to somebody else, it should work on their system, too, no matter where they store it on their hard drive.</p>
+
+<p>One last note: the <code>chrpath</code> utility can also be used to <em>change</em> the <code>rpath</code> in an executable or shared object.  That's handy if you've already built the binary and you just want to update the rpath before shipping it.  (See the man page for details.)</p>
+        </article>
+      </div>
     </div>
+    <footer>
+      <div class="owner">
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+      <p><a href="https://github.com/stuarteberg" class="avatar"><img src="https://avatars1.githubusercontent.com/u/1655821?s=60" width="48" height="48"/></a>View <a href="https://github.com/stuarteberg">stuarteberg</a> on <a href="https://www.github.com">GitHub</a></p>
 
-    
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/stuarteberg/stuarteberg.github.io/tarball/master" class="tar">tar</a><a href="https://github.com/stuarteberg/stuarteberg.github.io/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
 
-  </body>
+  
+</body>
 </html>
