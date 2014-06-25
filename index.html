@@ -1,28 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Eternal Journeyman by stuarteberg</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Eternal Journeyman : " />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Eternal Journeyman</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Eternal Journeyman</h1>
-        <p></p>
 
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/stuarteberg">View on GitHub</a>
 
-        <p class="view"><a href="https://github.com/stuarteberg">View My GitHub Profile</a></p>
+          <h1 id="project_title">Eternal Journeyman</h1>
+          <h2 id="project_tagline"></h2>
 
-      </header>
-      <section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h1>
 <a name="tutorial-ld_library_path-soname-and-rpath" class="anchor" href="#tutorial-ld_library_path-soname-and-rpath"><span class="octicon octicon-link"></span></a>Tutorial: LD_LIBRARY_PATH, soname, and rpath</h1>
 
@@ -99,7 +103,7 @@ Hello from foo.c
 <h2>
 <a name="option-2-hard-code-the-path-in-the-fooso-soname" class="anchor" href="#option-2-hard-code-the-path-in-the-fooso-soname"><span class="octicon octicon-link"></span></a>Option 2: Hard-code the path in the foo.so soname.</h2>
 
-<p>Let's back up a bit.  When we built <code>foo.so</code>, we didn't give any though to the loader.  Let's rebuild it with a custom <code>soname</code> setting:</p>
+<p>Let's back up a bit.  When we built <code>foo.so</code>, we didn't give any thought to the loader.  Let's rebuild it with a custom <code>soname</code> setting:</p>
 
 <pre><code>$ gcc -shared -fPIC -o foo.so -Wl,-soname,/tmp/example/foo.so foo.c
 </code></pre>
@@ -166,11 +170,16 @@ main: RPATH=$ORIGIN/.:$ORIGIN/../../lib
 
 <p>One last note: the <code>chrpath</code> utility can also be used to <em>change</em> the <code>rpath</code> in an executable or shared object.  That's handy if you've already built the binary and you just want to update the rpath before shipping it.  (See the man page for details.)</p>
       </section>
-      <footer>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+
     
+
   </body>
 </html>
